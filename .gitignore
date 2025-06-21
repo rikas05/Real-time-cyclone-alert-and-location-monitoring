@@ -1,0 +1,4 @@
+/myenv
+__pycache__/
+backend/node_modules/
+Data
