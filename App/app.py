@@ -74,7 +74,11 @@ CYCLONE_STATUS_DESCRIPTIONS = {
 # Background Weather State Updater
 #############################################
 def apply_trends():
-    """Update the weather state with realistic trends."""
+    """
+    Updates the global STATE with new weather trends.
+    Args: None
+    Returns: None
+    """
     global STATE
     trend_factor = 0.1  # Base fluctuation factor
 
@@ -102,6 +106,11 @@ def apply_trends():
         STATE["Cyclonic Severity"] = max(STATE["Cyclonic Severity"] - 0.1, 0)
 
 def background_updater():
+    """
+    Runs the apply_trends function in a loop to update weather state.
+    Args: None
+    Returns: None
+    """
     global STATE
     while True:
         apply_trends()
@@ -118,7 +127,11 @@ WEATHER_API_URL = "http://127.0.0.1:8000/current"
 latest_weather_data = {}
 
 def fetch_weather_data():
-    """Continuously fetch live weather data from the weather API every 10 seconds."""
+    """
+    Continuously fetches live weather data and updates latest_weather_data.
+    Args: None
+    Returns: None
+    """
     global latest_weather_data
     while True:
         try:
@@ -138,6 +151,12 @@ threading.Thread(target=fetch_weather_data, daemon=True).start()
 #############################################
 @app.post("/predict")
 def predict(features: dict):
+    """
+    Args:
+        features (dict): Dictionary of input features for prediction.
+    Returns:
+        dict: Cyclone status and description.
+    """
     try:
         input_df = pd.DataFrame([features])
         expected_features = model.feature_names_in_
@@ -153,6 +172,11 @@ def predict(features: dict):
 
 @app.get("/real_time_prediction")
 def real_time_cyclone_prediction():
+    """
+    Returns real-time cyclone prediction based on latest weather data.
+    Args: None
+    Returns: dict
+    """
     global latest_weather_data
     if not latest_weather_data:
         raise HTTPException(status_code=503, detail="No weather data available.")
@@ -180,6 +204,12 @@ active_connections = []
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket):
+    """
+    WebSocket endpoint for real-time communication.
+    Args:
+        websocket: WebSocket connection object.
+    Returns: None
+    """
     await websocket.accept()
     active_connections.append(websocket)
     try:
@@ -190,6 +220,12 @@ async def websocket_endpoint(websocket):
         active_connections.remove(websocket)
 
 async def broadcast_notification(message: str):
+    """
+    Broadcasts a message to all active WebSocket connections.
+    Args:
+        message (str): Message to send.
+    Returns: None
+    """
     for connection in active_connections:
         try:
             await connection.send_text(message)
@@ -205,6 +241,12 @@ class ProximityRequest(BaseModel):
 
 @app.post("/check_proximity")
 async def check_proximity(request: ProximityRequest):
+    """
+    Args:
+        request (ProximityRequest): Contains latitude and longitude.
+    Returns:
+        dict: Alert message, distance, and danger zones.
+    """
     if not latest_weather_data:
         raise HTTPException(status_code=503, detail="No weather data available.")
     
@@ -251,8 +293,9 @@ async def check_proximity(request: ProximityRequest):
 @app.get("/current")
 def get_current_weather():
     """
-    Return the current weather data.
-    If HARSH_TEST is True, override the cyclone's state to simulate harsh weather.
+    Returns the current weather data.
+    Args: None
+    Returns: dict
     """
     if HARSH_TEST:
         reference_lat = 20.0
@@ -283,6 +326,11 @@ def get_current_weather():
 
 @app.post("/simulate_cyclone")
 def simulate_cyclonic_condition():
+    """
+    Simulates a cyclonic condition in the weather state.
+    Args: None
+    Returns: dict
+    """
     global STATE
     STATE["Cyclonic"] = True
     STATE["Minimum Pressure"] = min(STATE["Minimum Pressure"], 970.0)
@@ -309,6 +357,11 @@ def simulate_cyclonic_condition():
 
 @app.post("/reset")
 def reset_weather():
+    """
+    Resets the weather state to baseline values.
+    Args: None
+    Returns: dict
+    """
     global STATE
     STATE.update({
         "Latitude": random.uniform(*RANGES["Latitude"]),
@@ -334,6 +387,12 @@ def reset_weather():
 
 @app.get("/forecast")
 def get_weather_forecast(hours: int = 6):
+    """
+    Args:
+        hours (int): Number of hours to forecast (default 6).
+    Returns:
+        dict: Forecast data for the specified hours.
+    """
     if hours < 1 or hours > 48:
         raise HTTPException(status_code=400, detail="Forecast range must be between 1 and 48 hours.")
 

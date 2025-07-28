@@ -14,7 +14,12 @@ EMAIL_PASSWORD = "your_password"
 
 def send_email_alert(recipients: List[str], subject: str, message: str):
     """
-    Send email alerts to recipients.
+    Args:
+        recipients (List[str]): List of recipient email addresses.
+        subject (str): Email subject.
+        message (str): Email body.
+    Returns:
+        None
     """
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
@@ -36,7 +41,10 @@ def send_email_alert(recipients: List[str], subject: str, message: str):
 
 def check_cyclonic_alerts(weather_data: Dict):
     """
-    Check if cyclonic severity exceeds the threshold and trigger an alert.
+    Args:
+        weather_data (Dict): Weather data containing at least 'Cyclonic Severity', 'Latitude', and 'Longitude'.
+    Returns:
+        dict: Alert status and message.
     """
     if weather_data.get("Cyclonic Severity", 0) > CYCLONIC_SEVERITY_THRESHOLD:
         severity = weather_data["Cyclonic Severity"]

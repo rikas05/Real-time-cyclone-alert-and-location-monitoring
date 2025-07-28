@@ -40,7 +40,11 @@ RANGES = {
 }
 
 def apply_trends():
-    """Update the weather state with realistic trends."""
+    """
+    Updates the global STATE with new weather trends.
+    Args: None
+    Returns: None
+    """
     global STATE
     trend_factor = 0.1  # Base fluctuation factor
 
@@ -72,6 +76,11 @@ def apply_trends():
 
 # Background thread to update weather state
 def background_updater():
+    """
+    Runs the apply_trends function in a loop to update weather state.
+    Args: None
+    Returns: None
+    """
     while True:
         apply_trends()
         time.sleep(60)  # Update every minute
@@ -82,7 +91,11 @@ thread.start()
 
 @app.get("/current")
 def get_current_weather():
-    """Return the current weather data."""
+    """
+    Returns the current weather data.
+    Args: None
+    Returns: dict
+    """
     return {
         "timestamp": datetime.now(),
         "weather_data": STATE
@@ -90,7 +103,11 @@ def get_current_weather():
 
 @app.post("/simulate_cyclone")
 def simulate_cyclonic_condition():
-    """Force a cyclonic condition."""
+    """
+    Forces a cyclonic condition in the weather state.
+    Args: None
+    Returns: dict
+    """
     global STATE
     STATE["Cyclonic"] = True
     STATE["Minimum Pressure"] = min(STATE["Minimum Pressure"], 970.0)
@@ -101,7 +118,11 @@ def simulate_cyclonic_condition():
 
 @app.post("/reset")
 def reset_weather():
-    """Reset weather state to baseline values."""
+    """
+    Resets the weather state to baseline values.
+    Args: None
+    Returns: dict
+    """
     global STATE
     STATE.update({
         "Latitude": random.uniform(*RANGES["Latitude"]),
@@ -127,7 +148,12 @@ def reset_weather():
 
 @app.get("/forecast")
 def get_weather_forecast(hours: int = 6):
-    """Provide a simple weather forecast for the next N hours."""
+    """
+    Args:
+        hours (int): Number of hours to forecast (default 6).
+    Returns:
+        dict: Forecast data for the specified hours.
+    """
     if hours < 1 or hours > 48:
         raise HTTPException(status_code=400, detail="Forecast range must be between 1 and 48 hours.")
 

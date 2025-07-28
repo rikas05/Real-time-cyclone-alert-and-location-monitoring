@@ -6,7 +6,6 @@ from sklearn.model_selection import train_test_split
 
 def load_data(file_path):
     """
-    Load the cyclone dataset.
     :param file_path: Path to the CSV file containing cyclone data.
     :return: DataFrame containing the loaded data.
     """
@@ -15,9 +14,6 @@ def load_data(file_path):
 
 def clean_data(df):
     """
-    Clean and preprocess the cyclone dataset.
-    Includes handling missing values, converting coordinates, and encoding categories.
-
     :param df: Raw DataFrame.
     :return: Cleaned DataFrame.
     """
